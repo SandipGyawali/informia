@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Theme } from "@radix-ui/themes";
+import GeminiContextProvider from "@/context/gemini-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Theme>
-        <body className={inter.className}>{children}</body>
-      </Theme>
+      <body className={inter.className}>
+        <Theme>
+          <GeminiContextProvider>{children}</GeminiContextProvider>
+        </Theme>
+      </body>
     </html>
   );
 }
