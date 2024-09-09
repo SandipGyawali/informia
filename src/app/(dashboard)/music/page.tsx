@@ -21,9 +21,9 @@ import remarkGfm from "remark-gfm";
 import { UserAvatar } from "@/components/avatar/user-avatar";
 import { BotAvatar } from "@/components/avatar/bot-avatar";
 
-function MessagePage() {
+function MusicPage() {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([]);
+  const [music, setMusic] = useState<string>();
   const headingData = dashboardTools[0];
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,18 +35,11 @@ function MessagePage() {
 
   const submit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: ChatCompletionMessageParam = {
-        role: "user",
-        content: values.prompt,
-      };
-
-      const newMessages = [...messages, userMessage];
-      const res = await axios.post("/api/message", {
-        message: userMessage,
+      const res = await axios.post("/api/music", {
+        prompt: values.prompt,
       });
-
       console.log(res.data);
-      setMessages((curr) => [...curr, userMessage, res.data]);
+      setMusic(res.data);
       form.reset();
     } catch (err) {
       console.log();
@@ -55,7 +48,7 @@ function MessagePage() {
     }
   };
 
-  console.log(messages);
+  // console.log(messages);
 
   return (
     <div className="rounded-md py-10">
@@ -98,65 +91,16 @@ function MessagePage() {
               <Loader label="Wait a moment..." />
             </div>
           )}
-          {messages.length === 0 && !isLoading && (
-            <EmptyMessage label="No conversation started." />
+          {!music && !isLoading && <EmptyMessage label="No music generated." />}
+          {music && (
+            <audio controls className="w-full mt-8">
+              <source src={music}></source>
+            </audio>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message) => (
-              <div
-                key={Math.round(Math.random() * 10000000)}
-                className={cn(
-                  "p-8 w-full flex items-start gap-x-8 justify-start rounded-lg",
-                  message.role === "user"
-                    ? "bg-white dark:bg-black border border-black/10 dark:border-gray-700"
-                    : "bg-muted"
-                )}
-              >
-                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <Markdown
-                  remarkPlugins={[remarkGfm]}
-                  className="leading-7 text-gray-900 dark:text-gray-300"
-                  components={{
-                    p: ({ node, ...props }) => (
-                      <p
-                        className="mb-4 text-base leading-relaxed"
-                        {...props}
-                      />
-                    ),
-                    h1: ({ node, ...props }) => (
-                      <h1 className="text-2xl font-semibold my-4" {...props} />
-                    ),
-                    h2: ({ node, ...props }) => (
-                      <h2 className="text-xl font-semibold my-3" {...props} />
-                    ),
-                    h3: ({ node, ...props }) => (
-                      <h3 className="text-lg font-semibold my-2" {...props} />
-                    ),
-                    code: ({ node, ...props }) => (
-                      <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
-                        <code {...props} />
-                      </pre>
-                    ),
-                    ul: ({ node, ...props }) => (
-                      <ul className="list-disc pl-5 mb-4" {...props} />
-                    ),
-                    ol: ({ node, ...props }) => (
-                      <ol className="list-decimal pl-5 mb-4" {...props} />
-                    ),
-                    li: ({ node, ...props }) => (
-                      <li className="mb-2" {...props} />
-                    ),
-                  }}
-                >
-                  {message?.content?.toString()}
-                </Markdown>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default MessagePage;
+export default MusicPage;

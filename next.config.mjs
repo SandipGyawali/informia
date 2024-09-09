@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    geminiAPiKey: process.env.GEMINI_API_KEY,
+  images: {
+    domains: ["oaidalleapiprodscus.blob.core.windows.net"],
   },
 };
 
